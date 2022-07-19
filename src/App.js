@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import sanitizeHtml from "sanitize-html"; // need this to help with the api format
-import Starter from "./components/Starter.js";
+import Starter from "./components/Starter.js"; // testing
 
 // API - https://opentdb.com/api_config.php
 // https://opentdb.com/api.php?amount=10&category=18&difficulty=medium&type=multiple
