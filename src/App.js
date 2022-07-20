@@ -23,29 +23,35 @@ function App() {
   const getQuiz = () => {
     Axios.get("https://opentdb.com/api.php?amount=5").then((response) => {
       const data = response.data.results;
-      // console.log(data);
+      console.log(response.data.results[0].incorrect_answers);
       setQuiz(data);
     });
   };
+
+  // let answers = quiz.incorrect_answers;
+  // console.log(answers);
+  // answers.push(quiz.correct_answer);
+  // console.log(answers);
 
   return (
     <div className="App">
       {starterElements}
       <button onClick={getQuiz}>Get Quiz</button>
       {/* map through the array, destructure the elements and render as necessary */}
-      {quiz.map(
+      {/* {quiz.map(
         ({
-          category: category,
           question: question,
           correct_answer: correct_answer,
           incorrect_answers: incorrect_answers,
         }) => (
           <div>
-            <div>{sanitizeHtml(category)}</div>
-            <div>{sanitizeHtml(question)}</div>
+            {console.log(typeof incorrect_answers)}
+            <h1>{sanitizeHtml(question)}</h1>
+            <h4>{sanitizeHtml(correct_answer)}</h4>
+            <h4>{sanitizeHtml(incorrect_answers)}</h4>
           </div>
         )
-      )}
+      )} */}
       <h1> test code</h1>
     </div>
   );
