@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Axios from "axios";
 import sanitizeHtml from "sanitize-html"; // need this to help with the api format
 import Starter from "./components/Starter.js"; // testing asdf
+import Answer from "./components/Answer.js";
 
 // API - https://opentdb.com/api_config.php
 // https://opentdb.com/api.php?amount=10&category=18&difficulty=medium&type=multiple
@@ -28,6 +29,21 @@ function App() {
     });
   };
 
+  const answers = quiz.map(
+    ({
+      question: question,
+      correct_answer: correct_answer,
+      incorrect_answers: incorrect_answers,
+    }) => (
+      <div>
+        {console.log(typeof incorrect_answers)}
+        <h1>{sanitizeHtml(question)}</h1>
+        <Answer value={sanitizeHtml(correct_answer)} />
+        <Answer value={sanitizeHtml(incorrect_answers)} />
+      </div>
+    )
+  );
+
   // let answers = quiz.incorrect_answers;
   // console.log(answers);
   // answers.push(quiz.correct_answer);
@@ -36,23 +52,8 @@ function App() {
   return (
     <div className="App">
       {starterElements}
+      {answers}
       <button onClick={getQuiz}>Get Quiz</button>
-      {/* map through the array, destructure the elements and render as necessary */}
-      {/* {quiz.map(
-        ({
-          question: question,
-          correct_answer: correct_answer,
-          incorrect_answers: incorrect_answers,
-        }) => (
-          <div>
-            {console.log(typeof incorrect_answers)}
-            <h1>{sanitizeHtml(question)}</h1>
-            <h4>{sanitizeHtml(correct_answer)}</h4>
-            <h4>{sanitizeHtml(incorrect_answers)}</h4>
-          </div>
-        )
-      )} */}
-      <h1> test code</h1>
     </div>
   );
 }
