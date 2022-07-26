@@ -3,12 +3,17 @@ import Axios from "axios";
 import sanitizeHtml from "sanitize-html"; // need this to help with the api format
 import Starter from "./components/Starter.js"; // testing asdf
 import Answer from "./components/Answer.js";
-import { nanoid } from "nanoid"; // not sure if I need this, but may need a way to reference incorrect answers with an ID
+import { nanoid } from "nanoid";
 
 // API - https://opentdb.com/api_config.php
 // https://opentdb.com/api.php?amount=10&category=18&difficulty=medium&type=multiple
 
 function App() {
+  // // getting too many rerender issues, pretty sure I need to use useEffect to track changes so we don't keep rerendering
+  //   React.useEffect(function() {
+  //     setStateAnswers(shuffle(allAnswers))}, [props.result]
+  //   })
+
   // for the starter screen
   const [start, setStart] = useState(false);
 
@@ -29,7 +34,9 @@ function App() {
     });
   };
 
-  // answers array
+  // answers
+
+  const [stateAnswers, setStateAnswers] = useState([]);
 
   const [chosenAnswers, setChosenAnswers] = useState([]);
 
@@ -47,6 +54,7 @@ function App() {
     );
     allAnswers.push(correctAnswerObject(correct_answer));
     shuffle(allAnswers);
+    // setStateAnswers(allAnswers);
 
     return (
       <div>
@@ -57,7 +65,7 @@ function App() {
               key={answer.id}
               correct_answer={answer.correct_answer}
               value={answer.value}
-              select_answer={answer.selected_answer}
+              selected_answer={answer.isPressed}
               clickAnswer={() => clickAnswer(answer.id)}
             />
           </div>
@@ -66,45 +74,34 @@ function App() {
     );
   });
 
+  function clickAnswer(id) {
+    console.log("hit");
+    setChosenAnswers((prevValues) =>
+      prevValues.map((answer) => {
+        console.log(answer.id);
+        return id === answer.id
+          ? { ...answer, isPressed: !answer.isPressed }
+          : answer;
+      })
+    );
+  }
+
   function correctAnswerObject(value) {
     return {
       value: sanitizeHtml(value),
       correct_answer: true,
       id: nanoid(),
-      selected_answer: false,
+      isPressed: false,
     };
   }
 
   function incorrectAnswerObject(value) {
     return {
-      value: value,
+      value: sanitizeHtml(value),
       correct_answer: false,
       id: nanoid(),
-      selected_answer: false,
+      isPressed: false,
     };
-  }
-
-  // function clickAnswer(id) {
-  //   setChosenAnswers((previousAnswer) =>
-  //     previousAnswer.map((answer) => {
-  //       return id === answer.id
-  //         ? { ...answer, selected_answer: !answer.selected_answer }
-  //         : answer;
-  //     })
-  //   );
-  // }
-
-  console.log(chosenAnswers);
-
-  function clickAnswer(id) {
-    setChosenAnswers();
-    setChosenAnswers((previousAnswer) =>
-      previousAnswer.map((answer) => {
-        return id === answer.id
-          ? { ...answer, selected_answer: !answer.selected_answer }
-          : answer;
-      })
-    );
   }
 
   return (
