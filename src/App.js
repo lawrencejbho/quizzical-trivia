@@ -9,11 +9,6 @@ import { nanoid } from "nanoid";
 // https://opentdb.com/api.php?amount=10&category=18&difficulty=medium&type=multiple
 
 function App() {
-  // // getting too many rerender issues, pretty sure I need to use useEffect to track changes so we don't keep rerendering
-  //   React.useEffect(function() {
-  //     setStateAnswers(shuffle(allAnswers))}, [props.result]
-  //   })
-
   // for the starter screen
   const [start, setStart] = useState(false);
 
@@ -28,86 +23,96 @@ function App() {
   const [quiz, setQuiz] = useState([]);
 
   const getQuiz = () => {
-    Axios.get("https://opentdb.com/api.php?amount=5").then((response) => {
+    Axios.get("https://opentdb.com/api.php?amount=2").then((response) => {
       const data = response.data.results;
-      setQuiz(data);
+      setQuiz(processData(data));
     });
   };
 
-  // answers
+  // process the Data to make it a lot easier to work with later on
 
-  const [stateAnswers, setStateAnswers] = useState([]);
+  function processData(data) {
+    function formatAnswers(correctAnswer, incorrectAnswers) {
+      return [
+        {
+          id: nanoid(),
+          selected: false,
+          correct: true,
+          answer: sanitizeHtml(correctAnswer),
+        },
+        ...incorrectAnswers.map((incorrectAnswer) => ({
+          id: nanoid(),
+          selected: false,
+          correct: false,
+          answer: sanitizeHtml(incorrectAnswer),
+        })),
+        // this line shuffles array elements
+        // so that the correct answer is not always on the same spot
+      ].sort(() => (Math.random() > 0.5 ? 1 : -1));
+    }
 
-  const [chosenAnswers, setChosenAnswers] = useState([]);
+    return data.map((item) => {
+      return {
+        id: nanoid(),
+        question: item.question,
+        answers: formatAnswers(
+          item["correct_answer"],
+          item["incorrect_answers"]
+        ),
+      };
+    });
+  }
 
-  var shuffle = require("shuffle-array");
-
-  // multiple entries, so we map through and grab the correct_answer + incorrect_answers, add both to a new array and then shuffle, then render that resulting array
-  const answers = quiz.map(function ({
-    question: question,
-    correct_answer: correct_answer,
-    incorrect_answers: incorrect_answers,
-  }) {
-    const allAnswers = [];
-    incorrect_answers.map((answer) =>
-      allAnswers.push(incorrectAnswerObject(answer))
-    );
-    allAnswers.push(correctAnswerObject(correct_answer));
-    shuffle(allAnswers);
-    // setStateAnswers(allAnswers);
-
+  // when I click on an answer, I'm getting an uncaught type error
+  const quizElements = quiz.map((item) => {
+    console.log(quiz);
+    if (item == undefined) return;
     return (
       <div>
-        <h1>{sanitizeHtml(question)}</h1>
-        {allAnswers.map((answer) => (
-          <div>
+        <div>
+          <h1>{sanitizeHtml(item.question)}</h1>
+          {item.answers.map((answer) => (
             <Answer
               key={answer.id}
-              correct_answer={answer.correct_answer}
-              value={answer.value}
-              selected_answer={answer.isPressed}
+              correct={answer.correct}
+              value={answer.answer}
+              selected={answer.selected}
               clickAnswer={() => clickAnswer(answer.id)}
             />
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     );
   });
 
+  // clicking is causing our quiz array to be set as undefined, not sure if we need to keep spreading?
+  // function clickAnswer(id) {
+  //   setQuiz((prevValues) =>
+  //     prevValues.map((item) =>
+  //       item.answers.map((answer) => {
+  //         return id === answer.id
+  //           ? { ...answer, selected: !answer.selected }
+  //           : answer;
+  //       })
+  //     )
+  //   );
+  // }
+
+  //* the quiz array is getting modified to not include the inital item with question so it gives an error everytime we click on an answer
   function clickAnswer(id) {
-    console.log("hit");
-    setChosenAnswers((prevValues) =>
-      prevValues.map((answer) => {
-        console.log(answer.id);
-        return id === answer.id
-          ? { ...answer, isPressed: !answer.isPressed }
-          : answer;
-      })
+    setQuiz((prevValues) =>
+      prevValues.map((item) =>
+        item.answers.map((answer) =>
+          id === answer.id ? { ...answer, selected: !answer.selected } : answer
+        )
+      )
     );
-  }
-
-  function correctAnswerObject(value) {
-    return {
-      value: sanitizeHtml(value),
-      correct_answer: true,
-      id: nanoid(),
-      isPressed: false,
-    };
-  }
-
-  function incorrectAnswerObject(value) {
-    return {
-      value: sanitizeHtml(value),
-      correct_answer: false,
-      id: nanoid(),
-      isPressed: false,
-    };
   }
 
   return (
     <div className="App">
       {starterElements}
-      {answers}
+      {quizElements}
       <button onClick={getQuiz}>Get Quiz</button>
     </div>
   );
