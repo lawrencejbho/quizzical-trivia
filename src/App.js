@@ -77,7 +77,7 @@ function App() {
               correct={answer.correct}
               value={answer.answer}
               selected={answer.selected}
-              clickAnswer={() => clickAnswer(answer.id)}
+              clickAnswer={() => clickAnswer(item.id, answer.id)}
             />
           ))}
         </div>
@@ -85,28 +85,23 @@ function App() {
     );
   });
 
-  // clicking is causing our quiz array to be set as undefined, not sure if we need to keep spreading?
-  // function clickAnswer(id) {
-  //   setQuiz((prevValues) =>
-  //     prevValues.map((item) =>
-  //       item.answers.map((answer) => {
-  //         return id === answer.id
-  //           ? { ...answer, selected: !answer.selected }
-  //           : answer;
-  //       })
-  //     )
-  //   );
-  // }
-
-  //* the quiz array is getting modified to not include the inital item with question so it gives an error everytime we click on an answer
-  function clickAnswer(id) {
-    setQuiz((prevValues) =>
-      prevValues.map((item) =>
-        item.answers.map((answer) =>
-          id === answer.id ? { ...answer, selected: !answer.selected } : answer
-        )
-      )
-    );
+  // we need to check for questionId here so that we can select an answer on a per question basis
+  function clickAnswer(questionId, answerId) {
+    setQuiz((prevValues) => {
+      return prevValues.map((item) => {
+        if (item.id == questionId) {
+          return {
+            ...item, // we need to map here or we will lose {...item} which will change our original array
+            answers: item.answers.map((answer) => {
+              return answerId === answer.id
+                ? { ...answer, selected: !answer.selected }
+                : { ...answer, selected: false }; // if we wanted to multi select, we leave this as answer, this instead makes it so that only one answer can be selected at a time
+            }),
+          };
+        }
+        return item;
+      });
+    });
   }
 
   return (
