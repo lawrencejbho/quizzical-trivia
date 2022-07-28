@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Axios from "axios";
-import sanitizeHtml from "sanitize-html"; // need this to help with the api format
-import Starter from "./components/Starter.js"; // testing asdf
+import sanitizeHtml from "sanitize-html"; // need this to help with the format of the API
+import Starter from "./components/Starter.js";
 import Answer from "./components/Answer.js";
 import { nanoid } from "nanoid";
 
@@ -29,7 +29,7 @@ function App() {
     });
   };
 
-  // process the Data to make it a lot easier to work with later on
+  // process the Data to make it a lot easier to work with later on and can assign additional properties
 
   function processData(data) {
     function formatAnswers(correctAnswer, incorrectAnswers) {
@@ -46,8 +46,8 @@ function App() {
           correct: false,
           answer: sanitizeHtml(incorrectAnswer),
         })),
-        // this line shuffles array elements
-        // so that the correct answer is not always on the same spot
+        // this line shuffles array elements so that the correct answer is not always on the same spot
+        // I initially tried using a shuffle function and that caused all kinds of issue with state, pretty sure I needed to use uesEffect but this is easier
       ].sort(() => (Math.random() > 0.5 ? 1 : -1));
     }
 
@@ -91,7 +91,7 @@ function App() {
       return prevValues.map((item) => {
         if (item.id == questionId) {
           return {
-            ...item, // we need to map here or we will lose {...item} which will change our original array
+            ...item, // we need to map inside the return object or we will lose {...item} which will change our original array as we return upwards
             answers: item.answers.map((answer) => {
               return answerId === answer.id
                 ? { ...answer, selected: !answer.selected }
