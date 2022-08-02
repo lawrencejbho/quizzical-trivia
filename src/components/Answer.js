@@ -9,13 +9,26 @@ function Answer(props) {
     }
   }
 
+  function changeBorder() {
+    if (props.selected) {
+      return "none";
+    } else {
+      return ".5px solid";
+    }
+  }
+
   const styles = {
     backgroundColor: changeColors(),
+    border: changeBorder(),
   };
 
   return (
     <div>
-      <button style={styles} onClick={props.clickAnswer}>
+      <button
+        style={styles}
+        className="answer-button"
+        onClick={props.clickAnswer}
+      >
         {props.value}
       </button>
     </div>

@@ -10,15 +10,17 @@ import { nanoid } from "nanoid";
 // https://opentdb.com/api.php?amount=10&category=18&difficulty=medium&type=multiple
 
 function App() {
-  const getQuiz = () => {
-    Axios.get("https://opentdb.com/api.php?amount=5").then((response) => {
-      const data = response.data.results;
-      setQuiz(processData(data));
-    });
-  };
-
   // this is going to help us immediately fetch the quiz so there's no delay when we hit the start Quiz
-  useEffect(() => getQuiz(), []);
+  // I moved getQuiz inside here because useEffect kept giving me an error in linux console, even though it still worked properly
+  useEffect(() => {
+    const getQuiz = () => {
+      Axios.get("https://opentdb.com/api.php?amount=5").then((response) => {
+        const data = response.data.results;
+        setQuiz(processData(data));
+      });
+    };
+    getQuiz();
+  }, []);
 
   // for the starter screen
   const [start, setStart] = useState(false);
@@ -77,17 +79,20 @@ function App() {
       return (
         <div>
           <div>
-            <h1>{sanitizeHtml(item.question)}</h1>
-            {item.answers.map((answer) => (
-              <Answer
-                checkAnswers={checkAnswers}
-                key={answer.id}
-                correct={answer.correct}
-                value={answer.answer}
-                selected={answer.selected}
-                clickAnswer={() => clickAnswer(item.id, answer.id)}
-              />
-            ))}
+            <h1 className="questions">{sanitizeHtml(item.question)}</h1>
+            <div className="answers-container">
+              {item.answers.map((answer) => (
+                <Answer
+                  checkAnswers={checkAnswers}
+                  key={answer.id}
+                  correct={answer.correct}
+                  value={answer.answer}
+                  selected={answer.selected}
+                  clickAnswer={() => clickAnswer(item.id, answer.id)}
+                />
+              ))}
+            </div>
+            <hr className="horizontal-line"></hr>
           </div>
         </div>
       );
