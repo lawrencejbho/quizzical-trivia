@@ -4,12 +4,30 @@ import sanitizeHtml from "sanitize-html"; // need this to help with the format o
 import Starter from "./components/Starter.js";
 import Answer from "./components/Answer.js";
 import Check from "./components/Check.js";
+import Complete from "./components/Complete.js";
 import { nanoid } from "nanoid";
 
 // API - https://opentdb.com/api_config.php
 // https://opentdb.com/api.php?amount=10&category=18&difficulty=medium&type=multiple
 
 function App() {
+  // for the starter screen
+  const [start, setStart] = useState(false);
+
+  const [quiz, setQuiz] = useState([]);
+
+  const [clickCheckAnswers, setClickCheckAnswers] = useState(false);
+
+  const [correctCount, setCorrectCount] = useState(0);
+
+  const [again, setAgain] = useState(0);
+
+  function isStart() {
+    setStart(true);
+  }
+
+  const starterElements = !start && <Starter isStart={isStart} />;
+
   // this is going to help us immediately fetch the quiz so there's no delay when we hit the start Quiz
   // I moved getQuiz inside here because useEffect kept giving me an error in linux console, even though it still worked properly
   useEffect(() => {
@@ -20,22 +38,9 @@ function App() {
       });
     };
     getQuiz();
-  }, []);
-
-  // for the starter screen
-  const [start, setStart] = useState(false);
-
-  function isStart() {
-    setStart(true);
-  }
-
-  const starterElements = !start && <Starter isStart={isStart} />;
+  }, [again]);
 
   // for the quiz API
-
-  const [quiz, setQuiz] = useState([]);
-
-  const [checkAnswers, setCheckAnswers] = useState(false);
 
   // process the Data to make it a lot easier to work as answers will be objects
   function processData(data) {
@@ -83,7 +88,7 @@ function App() {
             <div className="answers-container">
               {item.answers.map((answer) => (
                 <Answer
-                  checkAnswers={checkAnswers}
+                  checkAnswers={clickCheckAnswers}
                   key={answer.id}
                   correct={answer.correct}
                   value={answer.answer}
@@ -117,18 +122,40 @@ function App() {
     });
   }
 
-  function displayAnswers() {
-    setCheckAnswers((value) => !value);
+  // flip our clickCheckAnswers then uses find to go through all of the elements and checks for selected and correct then updates our correctCount state variable
+  function compareAnswers() {
+    setClickCheckAnswers((value) => !value);
+    quiz.find((question) => {
+      return question.answers.find((answer) => {
+        if (answer.correct && answer.selected) {
+          setCorrectCount((prevValue) => prevValue + 1);
+        }
+      });
+    });
   }
 
-  const checkElements = start && <Check click={displayAnswers} />;
+  // uses again in state so that useEffect can help track this, so we just add 1
+  // flip clickCheckAnswers back and also reset our correctCount
+  function playAgain() {
+    setAgain((prevValue) => prevValue + 1);
+    setClickCheckAnswers((value) => !value);
+    setCorrectCount(0);
+  }
+
+  // conditional rendering for our buttons and display at the end
+  const checkElements = () => {
+    if (start && !clickCheckAnswers) {
+      return <Check click={compareAnswers} />;
+    } else if (start && clickCheckAnswers) {
+      return <Complete count={correctCount} playAgain={playAgain} />;
+    }
+  };
 
   return (
     <div className="App">
       {starterElements}
       {quizElements}
-      <div></div>
-      {checkElements}
+      {checkElements()}
     </div>
   );
 }

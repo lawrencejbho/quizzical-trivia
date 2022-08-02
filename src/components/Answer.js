@@ -3,14 +3,14 @@ import React from "react";
 function Answer(props) {
   function changeColors() {
     if (props.correct && props.checkAnswers) {
-      return "#A2CDF5";
+      return "#94D7A2";
     } else if (props.selected) {
       return "#D6DBF5";
     }
   }
 
   function changeBorder() {
-    if (props.selected) {
+    if (props.selected || (props.correct && props.checkAnswers)) {
       return "none";
     } else {
       return ".5px solid";
