@@ -1,9 +1,11 @@
 import React from "react";
 
-function Check() {
+function Check(props) {
   return (
     <>
-      <button>Check Answers</button>
+      <button className="check-answer" onClick={props.click}>
+        Check Answers
+      </button>
     </>
   );
 }

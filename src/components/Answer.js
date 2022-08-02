@@ -1,9 +1,16 @@
 import React from "react";
 
 function Answer(props) {
+  function changeColors() {
+    if (props.correct && props.checkAnswers) {
+      return "#A2CDF5";
+    } else if (props.selected) {
+      return "#D6DBF5";
+    }
+  }
+
   const styles = {
-    // backgroundColor: props.correct_answer && "#D6DBF5",
-    backgroundColor: props.selected && "#D6DBF5",
+    backgroundColor: changeColors(),
   };
 
   return (

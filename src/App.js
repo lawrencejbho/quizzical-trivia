@@ -10,18 +10,18 @@ import { nanoid } from "nanoid";
 // https://opentdb.com/api.php?amount=10&category=18&difficulty=medium&type=multiple
 
 function App() {
+  const getQuiz = () => {
+    Axios.get("https://opentdb.com/api.php?amount=5").then((response) => {
+      const data = response.data.results;
+      setQuiz(processData(data));
+    });
+  };
+
   // this is going to help us immediately fetch the quiz so there's no delay when we hit the start Quiz
   useEffect(() => getQuiz(), []);
 
   // for the starter screen
   const [start, setStart] = useState(false);
-
-  const getQuiz = () => {
-    Axios.get("https://opentdb.com/api.php?amount=2").then((response) => {
-      const data = response.data.results;
-      setQuiz(processData(data));
-    });
-  };
 
   function isStart() {
     setStart(true);
@@ -32,6 +32,8 @@ function App() {
   // for the quiz API
 
   const [quiz, setQuiz] = useState([]);
+
+  const [checkAnswers, setCheckAnswers] = useState(false);
 
   // process the Data to make it a lot easier to work as answers will be objects
   function processData(data) {
@@ -78,6 +80,7 @@ function App() {
             <h1>{sanitizeHtml(item.question)}</h1>
             {item.answers.map((answer) => (
               <Answer
+                checkAnswers={checkAnswers}
                 key={answer.id}
                 correct={answer.correct}
                 value={answer.answer}
@@ -94,7 +97,7 @@ function App() {
   function clickAnswer(questionId, answerId) {
     setQuiz((prevValues) => {
       return prevValues.map((item) => {
-        if (item.id == questionId) {
+        if (item.id === questionId) {
           return {
             ...item, // need to map inside the return object or it will lose {...item} which will change our original array as we return upwards
             answers: item.answers.map((answer) => {
@@ -109,16 +112,17 @@ function App() {
     });
   }
 
-  function checkAnswers() {
-    return;
+  function displayAnswers() {
+    setCheckAnswers((value) => !value);
   }
 
-  const checkElements = quiz == [] && <Check />;
+  const checkElements = start && <Check click={displayAnswers} />;
 
   return (
     <div className="App">
       {starterElements}
       {quizElements}
+      <div></div>
       {checkElements}
     </div>
   );

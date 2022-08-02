@@ -32,3 +32,13 @@ code {
   color: white;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
+
+.check-answer { 
+  margin: 0 auto; /* not sure why but I need this margin: 0 auto to get this to center properly */
+  color: blue;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 200px;
+}
