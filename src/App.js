@@ -123,6 +123,7 @@ function App() {
   }
 
   // flip our clickCheckAnswers then uses find to go through all of the elements and checks for selected and correct then updates our correctCount state variable
+  //? not sure if this is the correct way of doing things
   function compareAnswers() {
     setClickCheckAnswers((value) => !value);
     quiz.find((question) => {
@@ -130,6 +131,7 @@ function App() {
         if (answer.correct && answer.selected) {
           setCorrectCount((prevValue) => prevValue + 1);
         }
+        return answer.invalid; //? find function expects a return value so I just set it to something that doesn't exist
       });
     });
   }

@@ -106,3 +106,30 @@ padding-top: 25px;
   color: white;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
+
+.complete-container{ 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.complete-score { 
+  margin: 1 auto; /*not sure why but I need this margin: 0 auto to get it to center.  After this the two objects were pushed to the margins.  I changed to 1 auto and they fit in the middle*/
+}
+
+
+.complete-answer{ 
+  margin: 1 auto; /*after changing to 1 auto, I can use gap to separate the two elements */ 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 120px;
+  height: 35px;
+  border-radius: 10px;
+  border: 1px solid #000000;
+  background-color: #4D5B9E;
+  color: white;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
