@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Axios from "axios";
-import sanitizeHtml from "sanitize-html"; // need this to help with the format of the API
+import sanitizeHtml from "sanitize-html"; // need this to help with the format of the API, still get some weird issues with amperands though
 import Starter from "./components/Starter.js";
 import Answer from "./components/Answer.js";
 import Check from "./components/Check.js";
@@ -11,7 +11,6 @@ import { nanoid } from "nanoid";
 // https://opentdb.com/api.php?amount=10&category=18&difficulty=medium&type=multiple
 
 function App() {
-  // for the starter screen
   const [start, setStart] = useState(false);
 
   const [quiz, setQuiz] = useState([]);
@@ -30,6 +29,7 @@ function App() {
 
   // this is going to help us immediately fetch the quiz so there's no delay when we hit the start Quiz
   // I moved getQuiz inside here because useEffect kept giving me an error in linux console, even though it still worked properly
+  // each time again is incremented, we will fetch a new quiz
   useEffect(() => {
     const getQuiz = () => {
       Axios.get("https://opentdb.com/api.php?amount=5").then((response) => {
@@ -40,11 +40,9 @@ function App() {
     getQuiz();
   }, [again]);
 
-  // for the quiz API
-
   // process the Data to make it a lot easier to work as answers will be objects
   function processData(data) {
-    // helper function to add additional properties and shuffle our answers
+    // helper function to make our answers into an array, add additional properties, and shuffles the arrays
     function formatAnswers(correctAnswer, incorrectAnswers) {
       return [
         {
@@ -59,13 +57,12 @@ function App() {
           correct: false,
           answer: sanitizeHtml(incorrectAnswer),
         })),
-        // this line shuffles array elements so that the correct answer is not always on the same spot
+        // *this line shuffles array elements so that the correct answer is not always on the same spot
         // I initially tried using a shuffle function and that caused all kinds of issue with state, pretty sure I needed to use uesEffect but this is easier
       ].sort(() => (Math.random() > 0.5 ? 1 : -1));
     }
 
-    // after formatting each answer, we'll drop them into a combined answers array.
-    // each question itself will also have it's own id
+    // each question itself will also have it's own id, each answer has it's own id
     return data.map((item) => {
       return {
         id: nanoid(),
@@ -123,7 +120,7 @@ function App() {
   }
 
   // flip our clickCheckAnswers then uses find to go through all of the elements and checks for selected and correct then updates our correctCount state variable
-  //? not sure if this is the correct way of doing things
+  // ? not sure if this is the correct way of doing things
   function compareAnswers() {
     setClickCheckAnswers((value) => !value);
     quiz.find((question) => {
@@ -131,7 +128,7 @@ function App() {
         if (answer.correct && answer.selected) {
           setCorrectCount((prevValue) => prevValue + 1);
         }
-        return answer.invalid; //? find function expects a return value so I just set it to something that doesn't exist
+        return answer.invalid; // ? find function expects a return value so I just set it to something that doesn't exist
       });
     });
   }
